@@ -3,6 +3,13 @@
         "string": "cpp",
         "*.tcc": "cpp",
         "deque": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "bit": "cpp",
+        "array": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp"
     }
 }
