@@ -10,5 +10,5 @@ namespace GS{
         std::string format(LogEvent::ptr event);
     };
 }
-s
+
 #endif

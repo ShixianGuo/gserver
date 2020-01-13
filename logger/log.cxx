@@ -31,12 +31,13 @@ namespace GS{
       m_appenders.push_back(appender);
       
       
+      
   }
   void Logger::delAppender(LogAppender::ptr appender){
       for(auto it=m_appenders.begin();it!=m_appenders.end();++it){
           if(*it==appender){
              m_appenders.erase(it);
-             breadk;
+             
           }
       }
   }

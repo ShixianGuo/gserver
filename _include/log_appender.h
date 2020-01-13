@@ -10,15 +10,13 @@ namespace GS{
             typedef std::shared_ptr<LogAppender> ptr;
             virtual ~LogAppender(){}
             
-    }
+    };
 
     class StdoutLogAppender:public LogAppender{
 
     };
 
-    class StdoutLogAppender:public LogAppender{
-        
-    };
+    
 }
 
 #endif // !1__GS_LOG_APPENDER_H__
