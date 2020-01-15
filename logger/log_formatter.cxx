@@ -146,7 +146,7 @@ namespace GS{
     public:
         LevelFormatItem(const std::string& str = "") {}
         void format(std::ostream& os, Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override {
-            os << LogLevel::ToString(level);
+            os << LogLevel::ToStirng(level);
         }
     };
     

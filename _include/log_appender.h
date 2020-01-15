@@ -21,7 +21,7 @@ namespace GS{
             LogLevel::Level getLevel() const { return m_level;}
             //设置日志级别
             void setLevel(LogLevel::Level val) { m_level = val;}
-        protected:
+        public:
             /// 日志级别
             LogLevel::Level m_level = LogLevel::DEBUG;
             /// 是否有自己的日志格式器
