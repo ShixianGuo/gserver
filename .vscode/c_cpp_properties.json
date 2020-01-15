@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/home/gsx/work_space/gserver_framework/_include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/include",
