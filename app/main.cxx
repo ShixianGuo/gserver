@@ -59,18 +59,16 @@ void global_init(int argc, const char** argv){
 
 void freeresource()
 {
-    //(1)对于因为设置可执行程序标题导致的环境变量分配的内存，我们应该释放
     if(gp_envmem)
     {
         delete []gp_envmem;
         gp_envmem = NULL;
     }
 
-    //(2)关闭日志文件
     if(ngx_log.fd != STDERR_FILENO && ngx_log.fd != -1)  
     {        
-        close(ngx_log.fd); //不用判断结果了
-        ngx_log.fd = -1; //标记下，防止被再次close吧        
+        close(ngx_log.fd);
+        ngx_log.fd = -1;    
     }
 }
 
@@ -81,11 +79,11 @@ int main(int argc, const char** argv) {
     global_init(argc,argv);
 
     CConfig *p_config = CConfig::GetInstance(); 
-    if(p_config->Load("nginx.conf") == false) //把配置文件内容载入到内存            
+    if(p_config->Load("nginx.conf") == false)    
     {   
-        ngx_log_init();    //初始化日志
+        ngx_log_init();    
         ngx_log_stderr(0,"配置文件[%s]载入失败，退出!","nginx.conf");
-        exitcode = 2;      //标记找不到文件
+        exitcode = 2;     
         goto lblexit;
     }
 

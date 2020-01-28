@@ -37,7 +37,7 @@ int ngx_daemon()
     ngx_parent = ngx_pid;  
     ngx_pid = getpid();       //当前子进程的id要重新取得
     
-    //(2)脱离终端，终端关闭，将跟此子进程无关
+    //(2)脱离终端，终端关闭
     if (setsid() == -1)  
     {
         ngx_log_error_core(NGX_LOG_EMERG, errno,"ngx_daemon()中setsid()失败!");
@@ -64,7 +64,7 @@ int ngx_daemon()
         ngx_log_error_core(NGX_LOG_EMERG,errno,"ngx_daemon()中dup2(STDOUT)失败!");
         return -1;
     }
-    if (fd > STDERR_FILENO)  //fd应该是3，这个应该成立
+    if (fd > STDERR_FILENO)  
      {
         if (close(fd) == -1) 
         {
