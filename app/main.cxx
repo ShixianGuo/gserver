@@ -88,7 +88,38 @@ int main(int argc, const char** argv) {
         exitcode = 2;      //标记找不到文件
         goto lblexit;
     }
-    
+
+    ngx_log_init();  
+   
+    if(ngx_init_signals() != 0) //信号初始化
+    {
+        exitcode = 1;
+        goto lblexit;
+    }     
+
+    ngx_init_setproctitle();  
+
+    if(p_config->GetIntDefault("Daemon",0) == 1) {
+        int cdaemonresult = ngx_daemon();
+        if(cdaemonresult == -1) 
+        {
+            exitcode = 1;  
+            goto lblexit;
+        }
+        if(cdaemonresult == 1)
+        {
+            //这是原始的父进程
+            freeresource();
+
+            exitcode = 0;
+            return exitcode;  
+        }
+
+        g_daemonized = 1;    //守护进程标记，
+
+    }
+
+    ngx_master_process_cycle(); 
 
  lblexit:
     //(5)该释放的资源要释放掉

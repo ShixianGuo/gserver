@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <stdint.h>   //类型相关头文件
+#include <stdint.h>  
 
 #include "ngx_global.h"
 #include "ngx_macro.h"
@@ -219,7 +219,8 @@ static u_char * ngx_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char
     size_t      len;
     uint32_t    ui32;
 
-    static u_char   hex[] = "0123456789abcdef";  
+    static u_char   hex[] = "0123456789abcdef"; 
+    static u_char   HEX[] = "0123456789ABCDEF"; 
 
     p = temp + NGX_INT64_LEN; 
 

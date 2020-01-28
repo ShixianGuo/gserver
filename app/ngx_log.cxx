@@ -1,15 +1,13 @@
-﻿//和日志相关的函数放之类
-
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>    //uintptr_t
-#include <stdarg.h>    //va_start....
-#include <unistd.h>    //STDERR_FILENO等
-#include <sys/time.h>  //gettimeofday
-#include <time.h>      //localtime_r
-#include <fcntl.h>     //open
-#include <errno.h>     //errno
+#include <stdint.h>   
+#include <stdarg.h>   
+#include <unistd.h>   
+#include <sys/time.h> 
+#include <time.h>     
+#include <fcntl.h>    
+#include <errno.h>    
 
 #include "ngx_global.h"
 #include "ngx_macro.h"
@@ -72,8 +70,8 @@ void ngx_log_stderr(int err, const char *fmt, ...)
 
 u_char *ngx_log_errno(u_char *buf, u_char *last, int err)
 {
-    //以下代码是我自己改造，感觉作者的代码有些瑕疵
-    char *perrorinfo = strerror(err); //根据资料不会返回NULL;
+   
+    char *perrorinfo = strerror(err); 
     size_t len = strlen(perrorinfo);
 
     //然后我还要插入一些字符串： (%d:)  
@@ -87,7 +85,6 @@ u_char *ngx_log_errno(u_char *buf, u_char *last, int err)
     size_t extralen = leftlen + rightlen; //左右的额外宽度
     if ((buf + len + extralen) < last)
     {
-        //保证整个我装得下，我就装，否则我全部抛弃 ,nginx的做法是 如果位置不够，就硬留出50个位置【哪怕覆盖掉以往的有效内容】，也要硬往后边塞，这样当然也可以；
         buf = ngx_cpymem(buf, leftstr, leftlen);
         buf = ngx_cpymem(buf, perrorinfo, len);
         buf = ngx_cpymem(buf, rightstr, rightlen);
@@ -98,7 +95,7 @@ u_char *ngx_log_errno(u_char *buf, u_char *last, int err)
 void ngx_log_error_core(int level,  int err, const char *fmt, ...)
 {
     u_char  *last;
-    u_char  errstr[NGX_MAX_ERROR_STR+1];   //这个+1也是我放入进来的，本函数可以参考ngx_log_stderr()函数的写法；
+    u_char  errstr[NGX_MAX_ERROR_STR+1];   
 
     memset(errstr,0,sizeof(errstr));  
     last = errstr + NGX_MAX_ERROR_STR;   
@@ -112,7 +109,7 @@ void ngx_log_error_core(int level,  int err, const char *fmt, ...)
     memset(&tv,0,sizeof(struct timeval));    
     memset(&tm,0,sizeof(struct tm));
 
-    gettimeofday(&tv, NULL);     //获取当前时间，返回自1970-01-01 00:00:00到现在经历的秒数【第二个参数是时区，一般不关心】        
+    gettimeofday(&tv, NULL);     //获取当前时间，返回自1970-01-01 00:00:00到现在经历的秒数
 
     sec = tv.tv_sec;             //秒
     localtime_r(&sec, &tm);      //把参数1的time_t转换为本地时间，保存到参数2中去，带_r的是线程安全的版本，尽量使用
@@ -126,39 +123,33 @@ void ngx_log_error_core(int level,  int err, const char *fmt, ...)
                     tm.tm_year, tm.tm_mon,
                     tm.tm_mday, tm.tm_hour,
                     tm.tm_min, tm.tm_sec);
-    p = ngx_cpymem(errstr,strcurrtime,strlen((const char *)strcurrtime));  //日期增加进来，得到形如：     2019/01/08 20:26:07
-    p = ngx_slprintf(p, last, " [%s] ", err_levels[level]);                //日志级别增加进来，得到形如：  2019/01/08 20:26:07 [crit] 
-    p = ngx_slprintf(p, last, "%P: ",ngx_pid);                             //支持%P格式，进程id增加进来，得到形如：   2019/01/08 20:50:15 [crit] 2037:
+    p = ngx_cpymem(errstr,strcurrtime,strlen((const char *)strcurrtime)); 
+    p = ngx_slprintf(p, last, " [%s] ", err_levels[level]);               
+    p = ngx_slprintf(p, last, "%P: ",ngx_pid);                            
 
-    va_start(args, fmt);                     //使args指向起始的参数
-    p = ngx_vslprintf(p, last, fmt, args);   //把fmt和args参数弄进去，组合出来这个字符串
-    va_end(args);                            //释放args 
+    va_start(args, fmt);                   
+    p = ngx_vslprintf(p, last, fmt, args); 
+    va_end(args);                          
 
     if (err)  //如果错误代码不是0，表示有错误发生
     {
         //错误代码和错误信息也要显示出来
         p = ngx_log_errno(p, last, err);
     }
-    //若位置不够，那换行也要硬插入到末尾，哪怕覆盖到其他内容
+   
     if (p >= (last - 1))
     {
         p = (last - 1) - 1; //把尾部空格留出来，这里感觉nginx处理的似乎就不对 
-                             //我觉得，last-1，才是最后 一个而有效的内存，而这个位置要保存\0，所以我认为再减1，这个位置，才适合保存\n
     }
     *p++ = '\n'; //增加个换行符       
 
-    //这么写代码是图方便：随时可以把流程弄到while后边去；大家可以借鉴一下这种写法
     ssize_t   n;
     while(1) 
     {        
         if (level > ngx_log.log_level) 
         {
-            //要打印的这个日志的等级太落后（等级数字太大，比配置文件中的数字大)
-            //这种日志就不打印了
             break;
         }
-        //磁盘是否满了的判断，先算了吧，还是由管理员保证这个事情吧； 
-
         //写日志文件        
         n = write(ngx_log.fd,errstr,p - errstr);  //文件写入成功后，如果中途
         if (n == -1) 
