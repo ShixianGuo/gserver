@@ -1,6 +1,4 @@
-﻿
-
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -32,9 +30,10 @@ pid_t gsx_parent;
 int gsx_process;
 int g_stopEvent;
 sig_atomic_t gsx_reap;
+
+
 int main(int argc, char *const *argv)
 {
-
     int exitcode = 0;
     int i;
     g_stopEvent = 0;

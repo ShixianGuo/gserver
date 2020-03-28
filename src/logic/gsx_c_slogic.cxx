@@ -32,7 +32,7 @@ typedef bool (CLogicSocket::*handler)(lpgsx_connection_t pConn,
                                       unsigned short iBodyLength);
 
 static const handler statusHandler[] =
-    {
+{
 
         &CLogicSocket::_HandlePing,
         NULL,
@@ -70,7 +70,6 @@ void CLogicSocket::threadRecvProcFunc(char *pMsgBuf)
 
     if (m_iLenPkgHeader == pkglen)
     {
-
         if (pPkgHeader->crc32 != 0)
         {
             return;

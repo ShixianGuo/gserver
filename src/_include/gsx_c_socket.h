@@ -42,19 +42,25 @@ struct gsx_connection_s
 
 	gsx_event_handler_pt rhandler;
 	gsx_event_handler_pt whandler;
+
 	uint32_t events;
 	unsigned char curStat;
 	char dataHeadInfo[_DATA_BUFSIZE_];
+
 	char *precvbuf;
 	unsigned int irecvlen;
 	char *precvMemPointer;
+
 	pthread_mutex_t logicPorcMutex;
 	std::atomic<int> iThrowsendCount;
+
 	char *psendMemPointer;
 	char *psendbuf;
+
 	unsigned int isendlen;
 	time_t inRecyTime;
 	time_t lastPingTime;
+	
 	lpgsx_connection_t next;
 };
 
@@ -88,23 +94,36 @@ protected:
 
 private:
 	void ReadConf();
+
+	//端口处理相关
 	bool gsx_open_listening_sockets();
 	void gsx_close_listening_sockets();
 	bool setnonblocking(int sockfd);
+
+	//连接池 或 连接 相关
+	lpgsx_connection_t gsx_get_connection(int isock);
+	void gsx_free_connection(lpgsx_connection_t pConn);
+
+    
 	void gsx_event_accept(lpgsx_connection_t oldc);
 	void gsx_read_request_handler(lpgsx_connection_t pConn);
 	void gsx_write_request_handler(lpgsx_connection_t pConn);
 	void gsx_close_connection(lpgsx_connection_t pConn);
+
 	ssize_t recvproc(lpgsx_connection_t pConn, char *buff, ssize_t buflen);
 	void gsx_wait_request_handler_proc_p1(lpgsx_connection_t pConn);
 	void gsx_wait_request_handler_proc_plast(lpgsx_connection_t pConn);
 	void clearMsgSendQueue();
 	ssize_t sendproc(lpgsx_connection_t c, char *buff, ssize_t size);
+
+
 	size_t gsx_sock_ntop(struct sockaddr *sa, int port, u_char *text, size_t len);
 	void initconnection();
 	void clearconnection();
-	lpgsx_connection_t gsx_get_connection(int isock);
-	void gsx_free_connection(lpgsx_connection_t pConn);
+
+
+
+
 	void inRecyConnectQueue(lpgsx_connection_t pConn);
 	void AddToTimerQueue(lpgsx_connection_t pConn);
 	time_t GetEarliestTime();

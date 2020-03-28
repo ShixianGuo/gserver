@@ -185,6 +185,7 @@ void CSocekt::ReadConf()
     return;
 }
 
+//打开监听端口【支持多个端口】
 bool CSocekt::gsx_open_listening_sockets()
 {
     int isock;
@@ -199,23 +200,23 @@ bool CSocekt::gsx_open_listening_sockets()
     CConfig *p_config = CConfig::GetInstance();
     for (int i = 0; i < m_ListenPortCount; i++)
     {
-
+        //创建socket
         isock = socket(AF_INET, SOCK_STREAM, 0);
         if (isock == -1)
         {
             gsx_log_stderr(errno, "CSocekt::Initialize()中socket()失败,i=%d.", i);
-
             return false;
         }
 
         int reuseaddr = 1;
+        //设置 SO_REUSEADDR：解决TIME_WAIT这个状态导致bind()失败的问题
         if (setsockopt(isock, SOL_SOCKET, SO_REUSEADDR, (const void *)&reuseaddr, sizeof(reuseaddr)) == -1)
         {
             gsx_log_stderr(errno, "CSocekt::Initialize()中setsockopt(SO_REUSEADDR)失败,i=%d.", i);
             close(isock);
             return false;
         }
-
+        //设置该socket为非阻塞
         if (setnonblocking(isock) == false)
         {
             gsx_log_stderr(errno, "CSocekt::Initialize()中setnonblocking()失败,i=%d.", i);
@@ -227,21 +228,21 @@ bool CSocekt::gsx_open_listening_sockets()
         sprintf(strinfo, "ListenPort%d", i);
         iport = p_config->GetIntDefault(strinfo, 10000);
         serv_addr.sin_port = htons((in_port_t)iport);
-
+        //绑定服务器地址结构体
         if (bind(isock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
         {
             gsx_log_stderr(errno, "CSocekt::Initialize()中bind()失败,i=%d.", i);
             close(isock);
             return false;
         }
-
+        //开始监听
         if (listen(isock, GSX_LISTEN_BACKLOG) == -1)
         {
             gsx_log_stderr(errno, "CSocekt::Initialize()中listen()失败,i=%d.", i);
             close(isock);
             return false;
         }
-
+        //放到监听列表
         lpgsx_listening_t p_listensocketitem = new gsx_listening_t;
         memset(p_listensocketitem, 0, sizeof(gsx_listening_t));
         p_listensocketitem->port = iport;
@@ -254,6 +255,7 @@ bool CSocekt::gsx_open_listening_sockets()
     return true;
 }
 
+//设置非阻塞
 bool CSocekt::setnonblocking(int sockfd)
 {
     int nb = 1;
@@ -264,8 +266,6 @@ bool CSocekt::setnonblocking(int sockfd)
     return true;
 
     /* 
-    
-    
     int opts = fcntl(sockfd, F_GETFL);  
     if(opts < 0) 
     {
@@ -282,11 +282,11 @@ bool CSocekt::setnonblocking(int sockfd)
     */
 }
 
+//关闭监听端口
 void CSocekt::gsx_close_listening_sockets()
 {
     for (int i = 0; i < m_ListenPortCount; i++)
     {
-
         close(m_ListenSocketList[i]->fd);
         gsx_log_error_core(GSX_LOG_INFO, 0, "关闭监听端口%d!", m_ListenSocketList[i]->port);
     }

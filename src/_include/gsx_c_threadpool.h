@@ -9,7 +9,6 @@ class CThreadPool
 {
 public:
     CThreadPool();
-
     ~CThreadPool();
 
 public:
