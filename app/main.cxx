@@ -6,7 +6,7 @@
 
 
 
-#include "ngx_macro.h"  //各种宏定义
+#include "ngx_macro.h"   //各种宏定义
 #include "ngx_func.h"    //各种函数声明
 #include "ngx_c_conf.h"  //和配置文件处理相关的类,名字带c_表示和类有关
 #include "ngx_global.h"

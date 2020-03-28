@@ -1,5 +1,4 @@
-﻿
-include config.mk
+﻿include config.mk
 all:
 	@for dir in $(BUILD_DIR); \
 	do \

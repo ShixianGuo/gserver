@@ -1,11 +1,8 @@
-﻿
-#.PHONY:all clean 
-
-ifeq ($(DEBUG),true)
-CC = g++ -g --std=c++11
+﻿ifeq ($(DEBUG),true)
+CC = g++ -std=c++11 -g 
 VERSION = debug
 else
-CC = g++  --std=c++11
+CC = g++ -std=c++11
 VERSION = release
 endif
 
@@ -18,8 +15,6 @@ BIN := $(addprefix $(BUILD_ROOT)/,$(BIN))
 LINK_OBJ_DIR = $(BUILD_ROOT)/app/link_obj
 DEP_DIR = $(BUILD_ROOT)/app/dep
 
-
-
 $(shell mkdir -p $(LINK_OBJ_DIR))
 $(shell mkdir -p $(DEP_DIR))
 
@@ -29,19 +24,16 @@ DEPS := $(addprefix $(DEP_DIR)/,$(DEPS))
 LINK_OBJ = $(wildcard $(LINK_OBJ_DIR)/*.o)
 LINK_OBJ += $(OBJS)
 
-
+#----------------------------------------------------------------------------------------
 all:$(DEPS) $(OBJS) $(BIN)
 
-
-ifneq ("$(wildcard $(DEPS))","")  
-include $(DEPS)  
+ifneq ("$(wildcard $(DEPS))","")   include $(DEPS)  
 endif
 
 #----------------------------------------------------------------1begin------------------
 $(BIN):$(LINK_OBJ)
-	@echo "------------------------build $(VERSION) mode--------------------------------"
-	$(CC) -o $@ $^
-
+	@echo "------------------------build $(VERSION) mode--------------------------------!!!"
+	$(CC) -o $@ $^ -lpthread
 #----------------------------------------------------------------1end-------------------
 
 
@@ -51,9 +43,21 @@ $(LINK_OBJ_DIR)/%.o:%.cxx
 #----------------------------------------------------------------2end-------------------
 
 
+
 #----------------------------------------------------------------3begin-----------------
 $(DEP_DIR)/%.d:%.cxx
 	echo -n $(LINK_OBJ_DIR)/ > $@
-	gcc -I$(INCLUDE_PATH) -MM $^ >> $@
+	$(CC) -I$(INCLUDE_PATH) -MM $^ >> $@
 #----------------------------------------------------------------3end-----------------
+
+
+
+#----------------------------------------------------------------nbegin-----------------
+#clean:			
+#	rm -f $(BIN) $(OBJS) $(DEPS) *.gch
+#----------------------------------------------------------------nend------------------
+
+
+
+
 
